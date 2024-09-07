@@ -5,6 +5,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Resume Builder</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Apply Arial font to the entire body */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            font-family: Arial, sans-serif; /* Ensure headings use the Arial font */
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-family: Arial, sans-serif; /* Label text in Arial */
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-family: Arial, sans-serif; /* Input and textarea font */
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            font-family: Arial, sans-serif; /* Button font */
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .resume {
+            margin-top: 30px;
+        }
+
+        .resume p {
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-family: Arial, sans-serif; /* Resume text font */
+        }
+
+        #downloadBtn, #shareBtn {
+            background-color: #007bff;
+            margin-top: 20px;
+            font-family: Arial, sans-serif; /* Button font */
+        }
+
+        #downloadBtn:hover, #shareBtn:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -44,6 +121,7 @@
             <p><strong>Experience:</strong> <span id="outputExperience"></span></p>
             <p><strong>Skills:</strong> <span id="outputSkills"></span></p>
             <button id="downloadBtn">Download Resume as PDF</button>
+            <button id="shareBtn">Share Resume Link</button>
         </div>
     </div>
 
@@ -52,124 +130,52 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script>
-        // Form Submission Event Listener
         document.getElementById('resumeForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Prevent page reload on form submit
+            event.preventDefault();
 
-            // Capture form data
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const education = document.getElementById('education').value;
             const experience = document.getElementById('experience').value;
             const skills = document.getElementById('skills').value;
 
-            // Populate the resume section with form data
             document.getElementById('outputName').textContent = name;
             document.getElementById('outputEmail').textContent = email;
             document.getElementById('outputEducation').textContent = education;
             document.getElementById('outputExperience').textContent = experience;
             document.getElementById('outputSkills').textContent = skills;
 
-            // Display the resume and the download button
             document.getElementById('resumeOutput').style.display = 'block';
+
+            const url = new URL(window.location.href);
+            url.searchParams.set('username', name);
+
+            history.pushState(null, '', url);
+
+            document.getElementById('shareBtn').onclick = function() {
+                navigator.clipboard.writeText(url.toString()).then(() => {
+                    alert('Resume link copied to clipboard: ' + url);
+                });
+            };
         });
 
-        // PDF Download Event Listener
         document.getElementById('downloadBtn').addEventListener('click', function() {
             const resumeElement = document.getElementById('resumeOutput');
 
-            // Capture the resume section and create a PDF
             html2canvas(resumeElement).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF();
 
-                // Add the image of the resume to the PDF
-                pdf.addImage(imgData, 'PNG', 10, 10, 180, 160); // Adjust dimensions as needed
-
-                // Download the PDF file
+                pdf.addImage(imgData, 'PNG', 10, 10, 180, 160);
                 pdf.save('resume.pdf');
             });
         });
+
+        window.onload = function() {
+            // Clear the name field on page load
+            document.getElementById('name').value = '';
+        };
     </script>
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background-color: #218838;
-        }
-
-        .resume {
-            margin-top: 30px;
-        }
-
-        .resume p {
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-
-        #downloadBtn {
-            background-color: #007bff;
-            margin-top: 20px;
-        }
-
-        #downloadBtn:hover {
-            background-color: #0056b3;
-        }
-    </style>
 </body>
 </html>
