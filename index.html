@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Resume Builder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Dynamic Resume Builder</h1>
+
+        <!-- Form Section for Input -->
+        <form id="resumeForm">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" placeholder="Enter your name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" placeholder="Enter your email" required>
+            </div>
+            <div class="form-group">
+                <label for="education">Education:</label>
+                <input type="text" id="education" placeholder="Enter your education details" required>
+            </div>
+            <div class="form-group">
+                <label for="experience">Experience:</label>
+                <textarea id="experience" placeholder="Enter your experience" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="skills">Skills:</label>
+                <input type="text" id="skills" placeholder="Enter your skills" required>
+            </div>
+            <button type="submit" id="generateBtn">Generate Your Resume</button>
+        </form>
+
+        <!-- Resume Output Section -->
+        <div id="resumeOutput" class="resume" style="display:none;">
+            <h2>Your Resume</h2>
+            <p><strong>Name:</strong> <span id="outputName"></span></p>
+            <p><strong>Email:</strong> <span id="outputEmail"></span></p>
+            <p><strong>Education:</strong> <span id="outputEducation"></span></p>
+            <p><strong>Experience:</strong> <span id="outputExperience"></span></p>
+            <p><strong>Skills:</strong> <span id="outputSkills"></span></p>
+            <button id="downloadBtn">Download Resume as PDF</button>
+        </div>
+    </div>
+
+    <!-- Including required scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        // Form Submission Event Listener
+        document.getElementById('resumeForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent page reload on form submit
+
+            // Capture form data
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const education = document.getElementById('education').value;
+            const experience = document.getElementById('experience').value;
+            const skills = document.getElementById('skills').value;
+
+            // Populate the resume section with form data
+            document.getElementById('outputName').textContent = name;
+            document.getElementById('outputEmail').textContent = email;
+            document.getElementById('outputEducation').textContent = education;
+            document.getElementById('outputExperience').textContent = experience;
+            document.getElementById('outputSkills').textContent = skills;
+
+            // Display the resume and the download button
+            document.getElementById('resumeOutput').style.display = 'block';
+        });
+
+        // PDF Download Event Listener
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const resumeElement = document.getElementById('resumeOutput');
+
+            // Capture the resume section and create a PDF
+            html2canvas(resumeElement).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF();
+
+                // Add the image of the resume to the PDF
+                pdf.addImage(imgData, 'PNG', 10, 10, 180, 160); // Adjust dimensions as needed
+
+                // Download the PDF file
+                pdf.save('resume.pdf');
+            });
+        });
+    </script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .resume {
+            margin-top: 30px;
+        }
+
+        .resume p {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        #downloadBtn {
+            background-color: #007bff;
+            margin-top: 20px;
+        }
+
+        #downloadBtn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</body>
+</html>
